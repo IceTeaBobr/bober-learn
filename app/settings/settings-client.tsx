@@ -24,6 +24,7 @@ export default function SettingsClient({
   const [dark, setDark] = useState(false);
   const [tz, setTz] = useState("Europe/Istanbul");
   const [clock, setClock] = useState("");
+  const [showLayers, setShowLayers] = useState(false); // reveal lasagna on click
 
   // sound icon that runs away from the cursor
   const [soundPos, setSoundPos] = useState({ x: 50, y: 30 });
@@ -154,20 +155,37 @@ export default function SettingsClient({
           </div>
         </section>
 
-        {/* 4) Layers of Security (lazanya) */}
+        {/* 4) Layers of Security — lazanya sadece butona basinca acilir */}
         <section className={`border rounded-xl p-4 mb-4 ${card}`}>
-          <p className="font-semibold mb-1">🔒 Layers of Security</p>
-          <p className={`text-xs mb-3 ${sub}`}>
-            Güvenliğiniz katman katman korunmaktadır.
-          </p>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/lasagna.svg"
-            alt="A slice of lasagna (layers of security)"
-            className="mx-auto"
-            width={220}
-            height={150}
-          />
+          <button
+            onClick={() => setShowLayers((s) => !s)}
+            className="w-full flex items-center justify-between font-semibold"
+          >
+            <span>🔒 Layers of Security</span>
+            <span className={sub}>{showLayers ? "▲" : "▼"}</span>
+          </button>
+          {showLayers && (
+            <div className="mt-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/lasagna.jpg"
+                alt="A slice of lasagna — layers of security"
+                className="mx-auto rounded-lg max-h-64"
+              />
+              <p className={`text-[10px] text-center mt-2 ${sub}`}>
+                Photo:{" "}
+                <a
+                  href="https://commons.wikimedia.org/wiki/File:Lasagna_2022.jpg"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  Derk29
+                </a>{" "}
+                / Wikimedia Commons, CC BY-SA 4.0
+              </p>
+            </div>
+          )}
         </section>
 
         {/* 5) Kaçan ses ikonu */}
