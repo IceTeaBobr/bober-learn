@@ -1,8 +1,9 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth/server";
+import { getTodos } from "./actions";
 import TodoApp from "./todo-app";
 
-// Always check the session fresh on each request.
+// Always check the session + load todos fresh on each request.
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
@@ -12,5 +13,8 @@ export default async function Home() {
     redirect("/auth/sign-in");
   }
 
-  return <TodoApp userEmail={session.user.email ?? ""} />;
+  // Load this user's todos from the database.
+  const todos = await getTodos();
+
+  return <TodoApp userEmail={session.user.email ?? ""} initialTodos={todos} />;
 }

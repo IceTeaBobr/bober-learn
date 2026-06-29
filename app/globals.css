@@ -42,14 +42,14 @@ body {
   animation: beaver-dance 0.45s ease-in-out infinite;
 }
 
-/* "WE STEAL YOUR DATA" yazısının yavaşça sağdan sola zıplaması */
+/* "WE STEAL YOUR DATA" yazısının yavaşça sağdan sola gidip zıplayarak dönmesi */
 @keyframes steal-bounce {
   0%   { transform: translate(0, 0); }
-  25%  { transform: translate(-25vw, -14px); }
-  50%  { transform: translate(-50vw, 0); }
-  75%  { transform: translate(-75vw, -14px); }
-  100% { transform: translate(-90vw, 0); }
+  25%  { transform: translate(-45vw, -28px); }
+  50%  { transform: translate(-88vw, 0); }
+  75%  { transform: translate(-45vw, -28px); }
+  100% { transform: translate(0, 0); }
 }
 .animate-steal {
-  animation: steal-bounce 12s ease-in-out infinite;
+  animation: steal-bounce 9s ease-in-out infinite;
 }

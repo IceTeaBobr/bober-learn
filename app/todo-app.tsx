@@ -3,9 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
-
-// Each task: text, done (completed?) and date.
-type Task = { text: string; done: boolean; date: string };
+import { addTodo, toggleTodo, deleteTodo, type Todo } from "./actions";
 
 // COD MW2 "deathscreen" quotes — one shows after 5 tasks are completed.
 const MW2_QUOTES = [
@@ -16,9 +14,15 @@ const MW2_QUOTES = [
   "It is well that war is so terrible, otherwise we should grow too fond of it. — Robert E. Lee",
 ];
 
-export default function TodoApp({ userEmail }: { userEmail: string }) {
+export default function TodoApp({
+  userEmail,
+  initialTodos,
+}: {
+  userEmail: string;
+  initialTodos: Todo[];
+}) {
   const router = useRouter();
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<Todo[]>(initialTodos);
   const [text, setText] = useState("");
   const [date, setDate] = useState(""); // selected date (optional)
   const [showBeaver, setShowBeaver] = useState(false); // is the dancing beaver visible
@@ -29,32 +33,32 @@ export default function TodoApp({ userEmail }: { userEmail: string }) {
     router.push("/auth/sign-in");
   }
 
-  // Add a new task (starts as not completed).
-  function addTask() {
+  // Add a new task: save to the database, then show it.
+  async function addTask() {
     if (text.trim() === "") return;
-    setTasks([...tasks, { text: text.trim(), done: false, date: date }]);
+    const created = await addTodo(text, date);
+    setTasks([...tasks, created]);
     setText("");
     setDate("");
   }
 
-  // Toggle a task's completed state when the green tick is clicked.
-  function toggleTask(index: number) {
-    const wasDone = tasks[index].done;
-    setTasks(
-      tasks.map((task, i) =>
-        i === index ? { ...task, done: !task.done } : task
-      )
-    );
-    // Only play the beaver when a task is NEWLY completed (not when un-checking).
-    if (!wasDone) {
+  // Toggle a task's completed state (optimistic update + save to DB).
+  async function handleToggle(id: number) {
+    const current = tasks.find((t) => t.id === id);
+    if (!current) return;
+    const newDone = !current.done;
+    setTasks(tasks.map((t) => (t.id === id ? { ...t, done: newDone } : t)));
+    if (newDone) {
       setShowBeaver(true);
       setTimeout(() => setShowBeaver(false), 2500);
     }
+    await toggleTodo(id, newDone);
   }
 
-  // Delete a task.
-  function deleteTask(index: number) {
-    setTasks(tasks.filter((_, i) => i !== index));
+  // Delete a task (optimistic remove + delete from DB).
+  async function handleDelete(id: number) {
+    setTasks(tasks.filter((t) => t.id !== id));
+    await deleteTodo(id);
   }
 
   // Counters.
@@ -64,8 +68,8 @@ export default function TodoApp({ userEmail }: { userEmail: string }) {
 
   return (
     <main className="min-h-screen bg-[#8a4b52] flex items-start justify-center p-6">
-      {/* Minecraft-style warning text in the corner (moved 1cm left + 1cm down) */}
-      <div className="animate-steal font-minecraft fixed top-[calc(1rem+1cm)] right-[calc(1rem+1cm)] z-50 text-[10px] leading-relaxed text-black text-right max-w-[170px]">
+      {/* Minecraft-style warning text in the corner (slides slowly right-to-left) */}
+      <div className="animate-steal font-minecraft fixed top-[calc(1rem+1cm)] right-[calc(1rem+1cm)] z-50 text-base text-black whitespace-nowrap">
         WE STEAL YOUR DATA!
       </div>
 
@@ -93,26 +97,10 @@ export default function TodoApp({ userEmail }: { userEmail: string }) {
             strokeWidth="7"
             strokeLinejoin="round"
           />
-          <text
-            x="50"
-            y="56"
-            textAnchor="middle"
-            fontSize="13"
-            fontWeight="bold"
-            fill="black"
-            fontFamily="Arial, sans-serif"
-          >
+          <text x="50" y="56" textAnchor="middle" fontSize="13" fontWeight="bold" fill="black" fontFamily="Arial, sans-serif">
             DARK
           </text>
-          <text
-            x="50"
-            y="72"
-            textAnchor="middle"
-            fontSize="13"
-            fontWeight="bold"
-            fill="black"
-            fontFamily="Arial, sans-serif"
-          >
+          <text x="50" y="72" textAnchor="middle" fontSize="13" fontWeight="bold" fill="black" fontFamily="Arial, sans-serif">
             TRIAD
           </text>
         </svg>
@@ -175,14 +163,14 @@ export default function TodoApp({ userEmail }: { userEmail: string }) {
 
         {/* Task list */}
         <ul className="flex flex-col gap-2">
-          {tasks.map((task, index) => (
+          {tasks.map((task) => (
             <li
-              key={index}
+              key={task.id}
               className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-lg px-3 py-2"
             >
               {/* Green completion tick */}
               <button
-                onClick={() => toggleTask(index)}
+                onClick={() => handleToggle(task.id)}
                 className={`w-6 h-6 flex-shrink-0 rounded-full border-2 flex items-center justify-center text-sm ${
                   task.done
                     ? "bg-green-500 border-green-500 text-white"
@@ -210,7 +198,7 @@ export default function TodoApp({ userEmail }: { userEmail: string }) {
 
               {/* Delete button */}
               <button
-                onClick={() => deleteTask(index)}
+                onClick={() => handleDelete(task.id)}
                 className="text-gray-400 hover:text-red-500 font-bold"
               >
                 ✕
