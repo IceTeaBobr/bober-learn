@@ -112,6 +112,78 @@ export default function TodoApp({
     setTimeout(() => setPrize(false), 3500);
   }
 
+  // Synthesize a door knock (triple "knock knock knock") with the Web Audio API.
+  function playKnock() {
+    try {
+      const Ctx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext;
+      const ctx = new Ctx();
+
+      function oneKnock(at: number) {
+        // low woody thump
+        const o = ctx.createOscillator();
+        o.type = "sine";
+        o.frequency.setValueAtTime(190, at);
+        o.frequency.exponentialRampToValueAtTime(70, at + 0.06);
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, at);
+        g.gain.exponentialRampToValueAtTime(0.8, at + 0.004);
+        g.gain.exponentialRampToValueAtTime(0.0001, at + 0.13);
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.start(at);
+        o.stop(at + 0.14);
+
+        // short noise transient (the "tap")
+        const len = Math.floor(ctx.sampleRate * 0.04);
+        const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+        const data = buf.getChannelData(0);
+        for (let i = 0; i < len; i++) {
+          data[i] = (Math.random() * 2 - 1) * (1 - i / len);
+        }
+        const noise = ctx.createBufferSource();
+        noise.buffer = buf;
+        const nf = ctx.createBiquadFilter();
+        nf.type = "bandpass";
+        nf.frequency.value = 260;
+        nf.Q.value = 1;
+        const ng = ctx.createGain();
+        ng.gain.value = 0.4;
+        noise.connect(nf);
+        nf.connect(ng);
+        ng.connect(ctx.destination);
+        noise.start(at);
+        noise.stop(at + 0.04);
+      }
+
+      const t = ctx.currentTime + 0.02;
+      oneKnock(t);
+      oneKnock(t + 0.24);
+      oneKnock(t + 0.46);
+
+      setTimeout(() => ctx.close(), 1200);
+    } catch {
+      // audio not supported — ignore
+    }
+  }
+
+  // Play a creepy knock at random intervals (45-260s).
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    function scheduleKnock() {
+      const delay = 45000 + Math.random() * 215000; // 45s - 260s
+      timer = setTimeout(() => {
+        playKnock();
+        scheduleKnock();
+      }, delay);
+    }
+    scheduleKnock();
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Sign the user out and go back to the login page.
   async function handleSignOut() {
     await authClient.signOut();
