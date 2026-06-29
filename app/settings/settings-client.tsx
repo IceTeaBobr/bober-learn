@@ -25,6 +25,7 @@ export default function SettingsClient({
   const [tz, setTz] = useState("Europe/Istanbul");
   const [clock, setClock] = useState("");
   const [showLayers, setShowLayers] = useState(false); // reveal lasagna on click
+  const [showClassified, setShowClassified] = useState(false); // reveal recipe on click
 
   // sound icon that runs away from the cursor
   const [soundPos, setSoundPos] = useState({ x: 50, y: 30 });
@@ -210,6 +211,78 @@ export default function SettingsClient({
               🔊
             </button>
           </div>
+        </section>
+
+        {/* Classified — gizli lazanya tarifi (orijinal) */}
+        <section className="border-2 border-red-700 rounded-xl p-4 mb-4 bg-stone-900 text-stone-100">
+          <button
+            onClick={() => setShowClassified((s) => !s)}
+            className="w-full flex items-center justify-between font-bold tracking-widest text-red-400"
+          >
+            <span>🕵️ CLASSIFIED</span>
+            <span className="text-stone-400">{showClassified ? "▲" : "▼"}</span>
+          </button>
+          {showClassified && (
+            <div className="mt-3 font-mono text-[12px] leading-relaxed text-stone-200">
+              <p className="text-red-400 border border-red-700 inline-block px-2 py-0.5 mb-3 -rotate-2">
+                ⛔ TOP SECRET — EYES ONLY
+              </p>
+              <h3 className="font-bold text-amber-300 mb-1">
+                Homemade Sicilian Lasagna (Lasagne alla Siciliana)
+              </h3>
+              <p className="text-stone-400 mb-3">Serves 6–8 · ~2 hours</p>
+
+              <p className="font-bold text-amber-300">RAGÙ</p>
+              <ul className="list-disc list-inside mb-2">
+                <li>2 tbsp olive oil</li>
+                <li>1 onion, 1 carrot, 1 celery stalk — finely diced</li>
+                <li>2 garlic cloves, minced</li>
+                <li>400 g ground beef + 200 g Italian sausage (casing removed)</li>
+                <li>100 ml dry red wine</li>
+                <li>700 ml tomato passata + 2 tbsp tomato paste</li>
+                <li>1 bay leaf, pinch of sugar, salt &amp; pepper, fresh basil</li>
+              </ul>
+
+              <p className="font-bold text-amber-300">LAYERS</p>
+              <ul className="list-disc list-inside mb-2">
+                <li>500 g lasagna sheets</li>
+                <li>1 small eggplant, sliced &amp; lightly fried (the Sicilian touch)</li>
+                <li>250 g ricotta</li>
+                <li>3 hard-boiled eggs, sliced</li>
+                <li>200 g caciocavallo (or provolone), diced</li>
+                <li>200 g mozzarella, torn</li>
+                <li>120 g grated pecorino</li>
+              </ul>
+
+              <p className="font-bold text-amber-300">METHOD</p>
+              <ol className="list-decimal list-inside space-y-1">
+                <li>
+                  Soften onion, carrot &amp; celery in the oil (8–10 min); add
+                  garlic for 1 min.
+                </li>
+                <li>
+                  Raise heat, brown the beef &amp; sausage well. Pour in the wine
+                  and let it cook off.
+                </li>
+                <li>
+                  Stir in tomato paste, then passata, bay leaf and sugar.
+                  Simmer low for 60–90 min; season and finish with torn basil.
+                </li>
+                <li>Fry the eggplant slices; drain on paper. Boil the sheets if needed.</li>
+                <li>Loosen the ricotta with a splash of milk, salt &amp; pepper.</li>
+                <li>
+                  Build ~4 layers: ragù → pasta → ricotta dabs → egg slices →
+                  eggplant → caciocavallo → mozzarella → pecorino. Repeat.
+                </li>
+                <li>Finish with ragù, mozzarella and a thick pecorino blanket.</li>
+                <li>
+                  Bake at 180°C (350°F): 25 min covered, then 15 min uncovered
+                  until bubbling and golden.
+                </li>
+                <li>Rest 15 min before cutting — non-negotiable. Buon appetito.</li>
+              </ol>
+            </div>
+          )}
         </section>
 
         {/* 6) C1'in isteği — tadinda: sessiz & terk edilmis */}
