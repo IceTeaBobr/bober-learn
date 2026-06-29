@@ -111,12 +111,14 @@ export default function Home() {
 
       {/* Dancing beaver — appears for 2.5s when a task is completed */}
       {showBeaver && (
-        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center pointer-events-none">
-          <div className="text-8xl animate-beaver">🦫</div>
-          <p className="mt-2 text-2xl font-extrabold text-white drop-shadow-lg">
+        <>
+          <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+            <div className="text-8xl animate-beaver">🦫</div>
+          </div>
+          <p className="fixed bottom-6 right-6 z-50 text-2xl font-extrabold text-black pointer-events-none">
             GOOD JOB, IDIOT 🎉
           </p>
-        </div>
+        </>
       )}
 
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-7 mt-16">
