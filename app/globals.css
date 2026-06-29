@@ -20,9 +20,9 @@
 }
 
 body {
-  background: #39ff14; /* neon yeşil */
+  background: #8a4b52; /* soluk bordo */
   color: var(--foreground);
-  font-family: "UnifrakturMaguntia", serif; /* King James 1611 blackletter fontu */
+  font-family: "Grenze Gotisch", serif; /* okunur gotik font */
 }
 
 /* Minecraft "yardımcı öğe" tooltip fontu */
@@ -40,4 +40,16 @@ body {
 }
 .animate-beaver {
   animation: beaver-dance 0.45s ease-in-out infinite;
+}
+
+/* "WE STEAL YOUR DATA" yazısının yavaşça sağdan sola zıplaması */
+@keyframes steal-bounce {
+  0%   { transform: translate(0, 0); }
+  25%  { transform: translate(-25vw, -14px); }
+  50%  { transform: translate(-50vw, 0); }
+  75%  { transform: translate(-75vw, -14px); }
+  100% { transform: translate(-90vw, 0); }
+}
+.animate-steal {
+  animation: steal-bounce 12s ease-in-out infinite;
 }

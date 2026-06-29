@@ -1,0 +1,73 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { authClient } from "@/lib/auth/client";
+
+export default function SignInPage() {
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    const { error } = await authClient.signIn.email({ email, password });
+    setLoading(false);
+    if (error) {
+      setError(error.message || "Sign in failed");
+      return;
+    }
+    router.push("/");
+  }
+
+  return (
+    <main className="min-h-screen bg-[#8a4b52] flex items-center justify-center p-6">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-sm bg-white rounded-2xl shadow-xl p-7 flex flex-col gap-4"
+      >
+        <h1 className="text-2xl font-bold text-gray-800">📝 Bober To-Do</h1>
+        <p className="text-sm text-gray-500 -mt-2">Sign in to your account</p>
+
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="border-2 border-gray-200 rounded-lg px-3 py-2 text-gray-900 outline-none focus:border-indigo-500"
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className="border-2 border-gray-200 rounded-lg px-3 py-2 text-gray-900 outline-none focus:border-indigo-500"
+        />
+
+        {error && <p className="text-sm text-red-600">{error}</p>}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-indigo-500 hover:bg-indigo-600 disabled:opacity-60 text-white font-semibold py-2 rounded-lg"
+        >
+          {loading ? "Signing in..." : "Sign in"}
+        </button>
+
+        <p className="text-sm text-gray-500 text-center">
+          No account?{" "}
+          <Link href="/auth/sign-up" className="text-indigo-500 hover:underline">
+            Sign up
+          </Link>
+        </p>
+      </form>
+    </main>
+  );
+}

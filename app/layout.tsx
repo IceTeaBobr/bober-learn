@@ -35,7 +35,7 @@ export default function RootLayout({
           crossOrigin="anonymous"
         />
         <link
-          href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=UnifrakturMaguntia&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Grenze+Gotisch:wght@400;500;700&family=Press+Start+2P&display=swap"
           rel="stylesheet"
         />
       </head>
