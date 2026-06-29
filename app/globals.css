@@ -20,7 +20,24 @@
 }
 
 body {
-  background: var(--background);
+  background: #39ff14; /* neon yeşil */
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "UnifrakturMaguntia", serif; /* King James 1611 blackletter fontu */
+}
+
+/* Minecraft "yardımcı öğe" tooltip fontu */
+.font-minecraft {
+  font-family: "Press Start 2P", monospace;
+}
+
+/* Görev tamamlanınca dans eden kunduz animasyonu (bilerek "boktan" :) ) */
+@keyframes beaver-dance {
+  0%   { transform: translateY(0) rotate(-18deg) scale(1); }
+  25%  { transform: translateY(-22px) rotate(18deg) scale(1.2); }
+  50%  { transform: translateY(0) rotate(-18deg) scale(1); }
+  75%  { transform: translateY(-14px) rotate(12deg) scale(1.12); }
+  100% { transform: translateY(0) rotate(-18deg) scale(1); }
+}
+.animate-beaver {
+  animation: beaver-dance 0.45s ease-in-out infinite;
 }
