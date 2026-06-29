@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { authClient } from "@/lib/auth/client";
 import { addTodo, toggleTodo, deleteTodo, type Todo } from "./actions";
 
@@ -147,12 +148,20 @@ export default function TodoApp({
         {/* Logged-in user + sign out */}
         <div className="flex items-center justify-between mb-4 text-xs text-gray-500">
           <span className="truncate">📜 {userEmail}</span>
-          <button
-            onClick={handleSignOut}
-            className="text-indigo-500 hover:underline font-semibold shrink-0 ml-2"
-          >
-            Sign out
-          </button>
+          <div className="flex items-center gap-3 shrink-0 ml-2">
+            <Link
+              href="/settings"
+              className="text-indigo-500 hover:underline font-semibold"
+            >
+              ⚙️ Settings
+            </Link>
+            <button
+              onClick={handleSignOut}
+              className="text-indigo-500 hover:underline font-semibold"
+            >
+              Sign out
+            </button>
+          </div>
         </div>
 
         <h1 className="text-2xl font-bold text-gray-800">📝 Bober To-Do</h1>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="150" viewBox="0 0 220 150">
+  <!-- tabak golgesi -->
+  <ellipse cx="110" cy="138" rx="95" ry="11" fill="#00000022"/>
+  <!-- katmanlar (alttan uste) -->
+  <g stroke="#7a4a18" stroke-width="1.2">
+    <rect x="30" y="104" width="160" height="16" rx="5" fill="#e6bd66"/>      <!-- makarna -->
+    <rect x="28" y="92"  width="164" height="14" rx="5" fill="#b5341f"/>      <!-- domates sos -->
+    <rect x="30" y="80"  width="160" height="16" rx="5" fill="#e6bd66"/>      <!-- makarna -->
+    <rect x="29" y="69"  width="162" height="13" rx="5" fill="#f6efd6"/>      <!-- ricotta -->
+    <rect x="28" y="57"  width="164" height="14" rx="5" fill="#b5341f"/>      <!-- domates sos -->
+    <rect x="30" y="45"  width="160" height="16" rx="5" fill="#e6bd66"/>      <!-- makarna -->
+  </g>
+  <!-- ust eriyik peynir + damlalar -->
+  <path d="M30 47 q10 -14 26 -6 q14 -12 28 -2 q14 -12 30 -2 q14 -10 28 0 q14 -8 28 4 l0 12 q-80 8 -168 0 z"
+        fill="#f2d785" stroke="#d8b85a" stroke-width="1.2"/>
+  <circle cx="64" cy="52" r="3" fill="#f2d785"/>
+  <circle cx="120" cy="54" r="3" fill="#f2d785"/>
+  <!-- feslegen yapraklari -->
+  <ellipse cx="96" cy="40" rx="7" ry="4" fill="#3f8a3f" transform="rotate(-20 96 40)"/>
+  <ellipse cx="112" cy="38" rx="7" ry="4" fill="#46a046" transform="rotate(15 112 38)"/>
+</svg>
