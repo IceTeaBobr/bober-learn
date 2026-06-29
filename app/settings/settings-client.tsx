@@ -26,6 +26,8 @@ export default function SettingsClient({
   const [clock, setClock] = useState("");
   const [showLayers, setShowLayers] = useState(false); // reveal lasagna on click
   const [showClassified, setShowClassified] = useState(false); // reveal recipe on click
+  const [flash, setFlash] = useState(false); // flashbang overlay
+  const [wakey, setWakey] = useState(false); // "wakey wakey" text
 
   // sound icon that runs away from the cursor
   const [soundPos, setSoundPos] = useState({ x: 50, y: 30 });
@@ -81,6 +83,73 @@ export default function SettingsClient({
     });
   }
 
+  // Synthesize a comedic fart with the Web Audio API (no audio file).
+  function playFart() {
+    try {
+      const Ctx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext;
+      const ctx = new Ctx();
+      const now = ctx.currentTime;
+      const dur = 0.85;
+
+      const o = ctx.createOscillator();
+      o.type = "sawtooth";
+      o.frequency.setValueAtTime(125, now);
+      o.frequency.exponentialRampToValueAtTime(65, now + dur); // descending
+
+      // sputter wobble
+      const lfo = ctx.createOscillator();
+      lfo.type = "square";
+      lfo.frequency.value = 19;
+      const lfoGain = ctx.createGain();
+      lfoGain.gain.value = 32;
+      lfo.connect(lfoGain);
+      lfoGain.connect(o.frequency);
+
+      const lp = ctx.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.frequency.value = 800;
+
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(0.6, now + 0.03);
+      g.gain.setValueAtTime(0.55, now + dur - 0.12);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+      o.connect(lp);
+      lp.connect(g);
+      g.connect(ctx.destination);
+      o.start(now);
+      o.stop(now + dur);
+      lfo.start(now);
+      lfo.stop(now + dur);
+
+      setTimeout(() => ctx.close(), (dur + 0.2) * 1000);
+    } catch {
+      // audio not supported — ignore
+    }
+  }
+
+  // Flashbang: full white, fades to normal over 3s, then the text appears + fart.
+  function triggerFlashbang() {
+    setWakey(false);
+    setFlash(true);
+    playFart();
+    setTimeout(() => {
+      setFlash(false);
+      setWakey(true);
+    }, 3000);
+    setTimeout(() => setWakey(false), 9000);
+  }
+
+  // Pressing dark mode: toggle, then flashbang 3 seconds later.
+  function toggleDark() {
+    setDark((d) => !d);
+    setTimeout(triggerFlashbang, 3000);
+  }
+
   const shell = dark ? "bg-gray-900 text-gray-100" : "bg-white text-gray-800";
   const card = dark
     ? "bg-gray-800 border-gray-700"
@@ -89,6 +158,21 @@ export default function SettingsClient({
 
   return (
     <main className="min-h-screen bg-transparent flex items-start justify-center p-6">
+      {/* Flashbang white overlay (fades to normal over 3s) */}
+      {flash && <div className="flashbang" />}
+
+      {/* "wakey wakey" text at the top, thick black font */}
+      {wakey && (
+        <div className="fixed top-0 inset-x-0 z-[10000] text-center pt-6 px-4 pointer-events-none">
+          <p
+            className="text-3xl md:text-4xl text-black"
+            style={{ fontFamily: "'Arial Black', Arial, sans-serif", fontWeight: 900 }}
+          >
+            wakey wakey hams and bakey my fella
+          </p>
+        </div>
+      )}
+
       <div className={`w-full max-w-md rounded-2xl shadow-xl p-7 mt-12 ${shell}`}>
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold">⚙️ Settings</h1>
@@ -105,7 +189,7 @@ export default function SettingsClient({
               <p className={`text-xs ${sub}`}>Karanlık temayı aç/kapat</p>
             </div>
             <button
-              onClick={() => setDark((d) => !d)}
+              onClick={toggleDark}
               className={`w-12 h-7 rounded-full transition relative ${
                 dark ? "bg-indigo-500" : "bg-gray-300"
               }`}

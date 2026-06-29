@@ -69,6 +69,20 @@ body {
   50%      { transform: translateY(9px) rotate(7deg); }
 }
 
+/* === Flashbang: tam beyaz, 3 saniyede kademeli normale doner === */
+.flashbang {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #ffffff;
+  pointer-events: none;
+  animation: flash-fade 3s ease-out forwards;
+}
+@keyframes flash-fade {
+  0%   { opacity: 1; filter: brightness(2); }
+  100% { opacity: 0; filter: brightness(1); }
+}
+
 /* Minecraft "yardımcı öğe" tooltip fontu */
 .font-minecraft {
   font-family: "Press Start 2P", monospace;
