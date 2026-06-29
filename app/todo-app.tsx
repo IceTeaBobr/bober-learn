@@ -28,6 +28,8 @@ export default function TodoApp({
   const [date, setDate] = useState(""); // selected date (optional)
   const [showBeaver, setShowBeaver] = useState(false); // is the dancing beaver visible
   const [nyanRun, setNyanRun] = useState(0); // increments to fire a nyan cat run
+  const [caughtRun, setCaughtRun] = useState(-1); // which run the user caught
+  const [prize, setPrize] = useState(false); // show the prize banner
 
   // Send a wobbly nyan cat across the screen at random intervals (5-60s).
   useEffect(() => {
@@ -42,6 +44,73 @@ export default function TodoApp({
     scheduleNext(true);
     return () => clearTimeout(timer);
   }, []);
+
+  // Synthesize a bass-boosted truck/air horn with the Web Audio API (no audio file).
+  function playTruckHorn() {
+    try {
+      const Ctx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext;
+      const ctx = new Ctx();
+      const now = ctx.currentTime;
+      const dur = 1.4;
+
+      const master = ctx.createGain();
+      master.gain.setValueAtTime(0.0001, now);
+      master.gain.exponentialRampToValueAtTime(0.9, now + 0.05);
+      master.gain.setValueAtTime(0.9, now + dur - 0.25);
+      master.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+
+      const lp = ctx.createBiquadFilter();
+      lp.type = "lowpass";
+      lp.frequency.value = 1500;
+
+      const shelf = ctx.createBiquadFilter();
+      shelf.type = "lowshelf";
+      shelf.frequency.value = 130;
+      shelf.gain.value = 16; // bass boost
+
+      master.connect(lp);
+      lp.connect(shelf);
+      shelf.connect(ctx.destination);
+
+      // brassy air-horn dyad + low octaves
+      for (const f of [110, 138.6, 220, 277.2]) {
+        const o = ctx.createOscillator();
+        o.type = "sawtooth";
+        o.frequency.value = f;
+        const g = ctx.createGain();
+        g.gain.value = 0.22;
+        o.connect(g);
+        g.connect(master);
+        o.start(now);
+        o.stop(now + dur);
+      }
+      // sub-bass for the "bass boosted" punch
+      const sub = ctx.createOscillator();
+      sub.type = "sine";
+      sub.frequency.value = 55;
+      const sg = ctx.createGain();
+      sg.gain.value = 0.55;
+      sub.connect(sg);
+      sg.connect(master);
+      sub.start(now);
+      sub.stop(now + dur);
+
+      setTimeout(() => ctx.close(), (dur + 0.3) * 1000);
+    } catch {
+      // audio not supported — ignore
+    }
+  }
+
+  // The user caught the nyan cat → award the prize.
+  function handleCatchNyan() {
+    setCaughtRun(nyanRun);
+    playTruckHorn();
+    setPrize(true);
+    setTimeout(() => setPrize(false), 3500);
+  }
 
   // Sign the user out and go back to the login page.
   async function handleSignOut() {
@@ -84,12 +153,25 @@ export default function TodoApp({
 
   return (
     <main className="min-h-screen bg-transparent flex items-start justify-center p-6">
-      {/* Wobbly nyan cat running across the screen at random intervals */}
-      {nyanRun > 0 && (
-        <div key={nyanRun} className="nyan-cat">
+      {/* Wobbly nyan cat — catch it (click) to win a prize! */}
+      {nyanRun > 0 && nyanRun !== caughtRun && (
+        <div key={nyanRun} className="nyan-cat" onClick={handleCatchNyan}>
           <div className="nyan-inner">
             <span className="nyan-rainbow" />
             <span className="nyan-face">🐱</span>
+          </div>
+        </div>
+      )}
+
+      {/* Prize banner — shown when the nyan cat is caught */}
+      {prize && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center pointer-events-none p-4">
+          <div className="bg-black/90 text-white rounded-2xl px-8 py-6 text-center border-4 border-yellow-400 shadow-2xl">
+            <p className="text-2xl font-extrabold">🏆 YOU CAUGHT THE NYAN CAT!</p>
+            <p className="mt-2 text-lg text-yellow-300">
+              📯 Prize: BASS-BOOSTED TRUCK HORN 📯
+            </p>
+            <p className="mt-1 text-xs text-gray-400">(turn your volume up 🔊)</p>
           </div>
         </div>
       )}
