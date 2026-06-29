@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
 import { addTodo, toggleTodo, deleteTodo, type Todo } from "./actions";
@@ -26,6 +26,21 @@ export default function TodoApp({
   const [text, setText] = useState("");
   const [date, setDate] = useState(""); // selected date (optional)
   const [showBeaver, setShowBeaver] = useState(false); // is the dancing beaver visible
+  const [nyanRun, setNyanRun] = useState(0); // increments to fire a nyan cat run
+
+  // Send a wobbly nyan cat across the screen at random intervals (5-60s).
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    function scheduleNext(first = false) {
+      const delay = first ? 4000 : 5000 + Math.random() * 55000;
+      timer = setTimeout(() => {
+        setNyanRun((n) => n + 1);
+        scheduleNext();
+      }, delay);
+    }
+    scheduleNext(true);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Sign the user out and go back to the login page.
   async function handleSignOut() {
@@ -67,7 +82,17 @@ export default function TodoApp({
   const quote = MW2_QUOTES[(completedCount - 5) % MW2_QUOTES.length];
 
   return (
-    <main className="min-h-screen bg-[#8a4b52] flex items-start justify-center p-6">
+    <main className="min-h-screen bg-transparent flex items-start justify-center p-6">
+      {/* Wobbly nyan cat running across the screen at random intervals */}
+      {nyanRun > 0 && (
+        <div key={nyanRun} className="nyan-cat">
+          <div className="nyan-inner">
+            <span className="nyan-rainbow" />
+            <span className="nyan-face">🐱</span>
+          </div>
+        </div>
+      )}
+
       {/* Minecraft-style warning text in the corner (slides slowly right-to-left) */}
       <div className="animate-steal font-minecraft fixed top-[calc(1rem+1cm)] right-[calc(1rem+1cm)] z-50 text-base text-black whitespace-nowrap">
         WE STEAL YOUR DATA!

@@ -20,9 +20,52 @@
 }
 
 body {
-  background: #8a4b52; /* soluk bordo */
+  background-color: #8a4b52; /* soluk bordo */
+  background-image: url("/lv-pattern.svg"); /* altin LV-tarzi desen */
+  background-size: 72px 72px;
   color: var(--foreground);
   font-family: "Grenze Gotisch", serif; /* okunur gotik font */
+}
+
+/* === Nyan cat: ekrani boydan boya kosar, zipir zipir (wobbly) === */
+.nyan-cat {
+  position: fixed;
+  top: 38%;
+  left: 0;
+  z-index: 60;
+  pointer-events: none;
+  animation: nyan-run 1.8s linear forwards;
+}
+.nyan-inner {
+  display: flex;
+  align-items: center;
+  animation: nyan-wobble 0.16s ease-in-out infinite;
+}
+.nyan-rainbow {
+  width: 110px;
+  height: 30px;
+  border-radius: 3px;
+  background: linear-gradient(
+    to bottom,
+    #ff0000 0 16.66%,
+    #ff9900 16.66% 33.33%,
+    #ffee00 33.33% 50%,
+    #33cc33 50% 66.66%,
+    #3399ff 66.66% 83.33%,
+    #9933ff 83.33% 100%
+  );
+}
+.nyan-face {
+  font-size: 2rem;
+  margin-left: -6px;
+}
+@keyframes nyan-run {
+  from { transform: translateX(-280px); }
+  to   { transform: translateX(100vw); }
+}
+@keyframes nyan-wobble {
+  0%, 100% { transform: translateY(-9px) rotate(-7deg); }
+  50%      { transform: translateY(9px) rotate(7deg); }
 }
 
 /* Minecraft "yardımcı öğe" tooltip fontu */
