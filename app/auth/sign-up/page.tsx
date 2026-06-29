@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth/client";
 
 export default function SignUpPage() {
-  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,13 +15,20 @@ export default function SignUpPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const { error } = await authClient.signUp.email({ email, name, password });
-    setLoading(false);
-    if (error) {
-      setError(error.message || "Sign up failed");
-      return;
+    try {
+      const res = await authClient.signUp.email({ email, name, password });
+      if (res?.error) {
+        const err = res.error;
+        setError(err.message || err.statusText || `Error ${err.status ?? ""}`);
+        setLoading(false);
+        return;
+      }
+      // Full page load so the server immediately sees the new session.
+      window.location.href = "/";
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Sign up failed");
+      setLoading(false);
     }
-    router.push("/");
   }
 
   return (
@@ -53,14 +58,19 @@ export default function SignUpPage() {
         />
         <input
           type="password"
-          placeholder="Password"
+          placeholder="Password (min 8 characters)"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          minLength={8}
           className="border-2 border-gray-200 rounded-lg px-3 py-2 text-gray-900 outline-none focus:border-indigo-500"
         />
 
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && (
+          <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+            ⚠️ {error}
+          </p>
+        )}
 
         <button
           type="submit"
